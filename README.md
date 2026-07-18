@@ -1,50 +1,85 @@
-# canvasworkspace-autosend
-1. Set up the GitHub repo
-1.	Go to github.com → New repository → name it canvasworkspace-autosend → Private (keeps your setup off public view) → Create.
-2.	Download the 6 files above into a folder on your laptop, e.g. C:\Users\Adam\canvasworkspace-autosend.
-3.	Open PowerShell in that folder (Shift+Right-click the folder → "Open PowerShell window here"), then:
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin https://github.com/YOUR-USERNAME/canvasworkspace-autosend.git
-   git push -u origin main
-2. Install Python
-1.	Download Python 3.11+ from python.org/downloads.
-2.	Run the installer — check "Add python.exe to PATH" at the bottom of the first screen before clicking Install. This is the step people miss and then nothing works from the terminal.
-3.	Confirm it worked — open a new PowerShell window and run python --version. You should see a version number.
-3. Install the project dependencies
-In PowerShell, inside the project folder:
-pip install -r requirements.txt
-playwright install chromium
-The second command downloads a Chromium browser Playwright controls directly — separate from your normal Chrome, so it won't interfere with your everyday browsing.
-4. The folder to save your cut files to
-This is a folder you create yourself — nothing from Brother auto-populates it. Make one now:
-mkdir C:\Users\Adam\CutFiles\ToSend
-This becomes your "drop zone." Whatever software you're designing cut files in, export/save the finished .fcm or .svg file into this folder instead of wherever you'd normally save it — the watcher script picks it up from there automatically.
-5. Configure the script
-1.	Copy config.example.json → rename the copy to config.json, in the same folder.
-2.	Open config.json and set:
-json
-   "watch_folder": "C:\\Users\\Adam\\CutFiles\\ToSend"
-(Note the double backslashes — that's required in JSON on Windows.)
-3. Leave the selectors fields as REPLACE_ME for now — you'll fill those in next.
-6. Log in once
-python login_setup.py
-A real browser window opens to CanvasWorkspace. Log in normally, confirm your ScanNCut DX is linked under your account, then go back to the PowerShell window and press Enter. This saves your session so the script won't need you to log in every time.
-7. Find the real button selectors
-With that same CanvasWorkspace browser tab open and logged in:
-1.	Press F12 to open DevTools.
-2.	Click the cursor icon top-left of the DevTools panel (or Ctrl+Shift+C).
-3.	Click the actual "Import" button on the page — DevTools jumps to and highlights the matching HTML.
-4.	Right-click that highlighted line → Copy → Copy selector.
-5.	Paste it into config.json as "import_button".
-6.	Do the same for the file upload element and the "Send to my machine" button.
-I can't see your logged-in account, so this step has to happen on your end — but it's a five-minute, repeatable process, not coding.
-8. Run it
-python watcher.py
-Leave that window open. Drop a test .fcm file into C:\Users\Adam\CutFiles\ToSend and watch it open a browser, import, and send.
-9. (Optional) Run it automatically at login
-Task Scheduler → Create Task → Trigger: "At log on" → Action: Start a program → Program: python, Arguments: C:\Users\Adam\canvasworkspace-autosend\watcher.py. Now it's always running in the background without you remembering to launch it.
-Try steps 1–6 and let me know what you hit — step 7 is the one most likely to need a back-and-forth since I'm working blind on the actual page layout.
+# CanvasWorkspace Auto-Send
 
+Watches a folder on your Windows laptop. Whenever you drop a finished cut
+file into it, the script opens CanvasWorkspace in a browser, imports the
+file, and sends it to your linked ScanNCut DX so it's sitting in the
+machine's queue by the time you walk downstairs.
+
+## What this is (and isn't)
+
+- Brother doesn't publish a developer API for CanvasWorkspace or the
+  ScanNCut DX. This tool works by driving the real CanvasWorkspace
+  *website* the same way you would with a mouse — clicking Import,
+  picking your file, clicking "Send to my machine" — just done by code
+  instead of by hand.
+- Because it depends on the website's current layout, **Brother
+  changing their site can break it**. That's expected with this kind of
+  tool; when it breaks, you re-find the button and update `config.json`
+  (see "Finding selectors" below), you don't need to touch the Python.
+- It **does not** and cannot start the actual cut on the machine — that
+  still requires you to load the mat and tap Start on the ScanNCut's own
+  screen. That's a safety gate Brother built into the machine itself,
+  not something this script can or should bypass.
+- This does not work for the Aveneer/Artspira side — Artspira is
+  mobile-app only, with no desktop or browser version to automate
+  against.
+
+## Folder structure
+
+```
+canvasworkspace-autosend/
+├── README.md
+├── requirements.txt
+├── config.example.json   -> copy to config.json and edit
+├── login_setup.py         -> run once to save your login session
+├── watcher.py              -> the script that runs continuously
+└── .gitignore
+```
+
+## One-time setup
+
+1. Install Python 3.11+ from python.org (check "Add python.exe to PATH"
+   during install).
+2. Open a terminal in this folder and run:
+   ```
+   pip install -r requirements.txt
+   playwright install chromium
+   ```
+3. Copy `config.example.json` to `config.json` and edit:
+   - `watch_folder`: the folder you'll save finished cut files into
+     (e.g. `C:\Users\Adam\CutFiles\ToSend`). This is just a regular
+     folder you create yourself — pick wherever you already save
+     exported .fcm/.svg files from your design software.
+4. Run `python login_setup.py`. A real browser window opens — log in to
+   CanvasWorkspace normally, then press Enter in the terminal. This
+   saves your session to `storage_state.json` so the watcher doesn't
+   need you to log in every time.
+5. Run `python watcher.py`. Leave it running in the background.
+6. Drop a `.fcm` or `.svg` file into your watch folder — the script
+   should open a browser, import it, and send it to your machine.
+
+## Finding selectors
+
+`config.json` has three placeholders under `"selectors"` that tell
+Playwright which buttons to click. I can't see your logged-in
+CanvasWorkspace account, so these need to be filled in once, by you:
+
+1. Open CanvasWorkspace in Chrome, log in.
+2. Press F12 to open DevTools, click the arrow/cursor icon (top-left of
+   DevTools), then click the actual "Import" button on the page.
+3. DevTools highlights the matching HTML. Right-click it in DevTools →
+   Copy → Copy selector.
+4. Paste that into `config.json` under `import_button`.
+5. Repeat for the file upload input and the "Send to my machine" button.
+
+## Running it automatically at login (optional)
+
+Once it's working reliably, use Windows Task Scheduler to launch
+`watcher.py` at login so you never have to remember to start it — steps
+in the walkthrough below.
+
+## Security note
+
+`storage_state.json` contains your live login session — treat it like a
+password. It's already excluded in `.gitignore` so it won't get pushed
+to GitHub, but double check before your first commit.

@@ -1,0 +1,8 @@
+{
+  "watch_folder": "C:\\Users\\YOURNAME\\CutFiles\\ToSend",
+  "selectors": {
+    "import_button": "REPLACE_ME",
+    "file_input": "REPLACE_ME",
+    "send_to_machine_button": "REPLACE_ME"
+  }
+}
