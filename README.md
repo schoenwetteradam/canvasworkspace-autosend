@@ -36,6 +36,11 @@ machine's queue by the time you walk downstairs.
   (`scan-n-cut-guide`): design → save into the folder → go downstairs →
   load the mat → press Start.
 
+- **Sending to her embroidery machines?** That's separate from this repo —
+  see **[EMBROIDERY.md](EMBROIDERY.md)**. In short: the Aveneer takes designs
+  from the laptop wirelessly via Brother's free *Design Database Transfer*; the
+  Baby Lock Valiant takes a USB stick.
+
 There are three double-click launchers so nobody has to type commands:
 
 | File | What it does |
