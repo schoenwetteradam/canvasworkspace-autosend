@@ -23,6 +23,31 @@ machine's queue by the time you walk downstairs.
 - This does not work for the Aveneer/Artspira side — Artspira is
   mobile-app only, with no desktop or browser version to automate
   against.
+- This is a **cutting** workflow only. It does **not** do embroidery —
+  embroidery needs an embroidery machine and different files (e.g.
+  `.pes`). The ScanNCut can still *support* embroidery by cutting
+  perfect appliqué pieces, but it won't stitch.
+
+## Quick start
+
+- **Setting it up?** Follow **[SETUP.md](SETUP.md)** — a step-by-step
+  Windows walkthrough written for whoever installs this.
+- **Just want to use it every day?** See the printable large-print guide
+  (`scan-n-cut-guide`): design → save into the folder → go downstairs →
+  load the mat → press Start.
+
+- **Sending to her embroidery machines?** That's separate from this repo —
+  see **[EMBROIDERY.md](EMBROIDERY.md)**. In short: the Aveneer takes designs
+  from the laptop wirelessly via Brother's free *Design Database Transfer*; the
+  Baby Lock Valiant takes a USB stick.
+
+There are three double-click launchers so nobody has to type commands:
+
+| File | What it does |
+| --- | --- |
+| `first_time_setup.bat` | Installs everything, once. |
+| `run_login_setup.bat` | Saves the CanvasWorkspace login. |
+| `run_watcher.bat` | Starts the folder watcher (the one that runs all day). |
 
 ## Folder structure
 
@@ -75,8 +100,8 @@ CanvasWorkspace account, so these need to be filled in once, by you:
 ## Running it automatically at login (optional)
 
 Once it's working reliably, use Windows Task Scheduler to launch
-`watcher.py` at login so you never have to remember to start it — steps
-in the walkthrough below.
+`run_watcher.bat` at login so you never have to remember to start it —
+full steps are in **[SETUP.md](SETUP.md)** (Step 8).
 
 ## Security note
 
